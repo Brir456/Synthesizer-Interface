@@ -98,8 +98,8 @@ extern "C"
     extern lv_obj_t *ui_OSC_Waveform;
     extern lv_obj_t *ui_Osc_Level_Label;
     extern lv_obj_t *ui_Osc_Level_Val;
-    extern lv_obj_t *ui_Osc_Oct_Label;
-    extern lv_obj_t *ui_Osc_Oct_Val;
+    extern lv_obj_t *ui_Osc_Semi_Label;
+    extern lv_obj_t *ui_Osc_Semi_Val;
     extern lv_obj_t *ui_Osc_Fine_Label;
     extern lv_obj_t *ui_Osc_Fine_Val;
     extern lv_obj_t *ui_ModOsc;
@@ -238,7 +238,6 @@ extern "C"
     extern lv_obj_t *ui_MacroElement19;
     extern lv_obj_t *ui_Top_Bar_Line;
     extern lv_obj_t *ui____initial_actions0;
-
 
     LV_IMG_DECLARE(ui_img_analyzer_bg_transparent_100x50_png); // assets/Analyzer BG Transparent 100x50.png
     LV_IMG_DECLARE(ui_img_env_1_png);                          // assets/ENV 1.png

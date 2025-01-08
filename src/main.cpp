@@ -86,11 +86,11 @@ int audioValues[45] = {
     4,    //  0: Portamento Time
     0,    //  1: Osc 1 Table
     255,  //  2: Osc 1 Level
-    0,    //  3: Osc 1 Oct
+    0,    //  3: Osc 1 Semi
     0,    //  4: Osc 1 Fine
     0,    //  5: Osc 2 Table
     0,    //  6: Osc 2 Level
-    0,    //  7: Osc 2 Oct
+    0,    //  7: Osc 2 Semi
     0,    //  8: Osc 2 Fine
     4,    //  9: Noise Table
     0,    // 10: Noise Level
@@ -103,7 +103,7 @@ int audioValues[45] = {
     500,  // 17: Env 1 D
     5000, // 18: Env 1 S
     50,   // 19: Env 1 R
-    0,    // 20: Env 2 State
+    1,    // 20: Env 2 State
     255,  // 21: Env 2 AL
     255,  // 22: Env 2 DL
     0,    // 23: Env 2 SL
@@ -113,10 +113,10 @@ int audioValues[45] = {
     200,  // 27: Env 2 S
     50,   // 28: Env 2 R
     1,    // 29: LFO 1 Table
-    0,    // 30: LFO 1 State
+    1,    // 30: LFO 1 State
     255,  // 31: LFO 1 Freq
     1,    // 32: LFO 2 Table
-    0,    // 33: LFO 2 State
+    1,    // 33: LFO 2 State
     1,    // 34: LFO 2 Freq
     0,    // 35: Pre Dist State
     0,    // 36: Pre Dist Drive
@@ -124,21 +124,21 @@ int audioValues[45] = {
     0,    // 38: Post Dist State
     0,    // 39: Post Dist Drive
     0,    // 40: Post Dist Mode
-    0,    // 41: Filter Type (0 equals none)
+    0,    // 41: Filter Type
     255,  // 42: Filter Cutoff
     5,    // 43: Filter Resonance
-    1     // 44: Filter State
+    0     // 44: Filter State
 };
 
 String audioValuesName[45] = {
     "SLIDETIME",
     "OSC1_TABLE",
     "OSC1_LEVEL",
-    "OSC1_OCT",
+    "OSC1_SEMI",
     "OSC1_FINE",
     "OSC2_TABLE",
     "OSC2_LEVEL",
-    "OSC2_OCT",
+    "OSC2_SEMI",
     "OSC2_FINE",
     "NOISE_TABLE",
     "NOISE_LEVEL",
@@ -192,6 +192,11 @@ byte currentOsc = 0;
 byte currentLFO = 0;
 byte currentEnv = 0;
 
+void sendUARTMsg(String msg)
+{
+  Serial.println(msg);
+  Serial1.println(msg);
+}
 /**
  * @brief Updates the background color of a group of buttons or labels,
  *        highlighting the selected one based on the provided index.
@@ -410,12 +415,12 @@ void updateOscSettings()
   updateSelectedButtonColor(currentOsc, 3, 0x2EBAE4, 0x3E495C, ui_OSC_1_Label_Container, ui_OSC_2_Label_Container, ui_Noise_Label_Container);
   if (currentOsc < 2)
   {
-    updateLabelValue(3, "", ui_Osc_Level_Val, audioValues[2 + 4 * currentOsc], ui_Osc_Oct_Val, audioValues[3 + 4 * currentOsc], ui_Osc_Fine_Val, audioValues[4 + 4 * currentOsc]);
+    updateLabelValue(3, "", ui_Osc_Level_Val, audioValues[2 + 4 * currentOsc], ui_Osc_Semi_Val, audioValues[3 + 4 * currentOsc], ui_Osc_Fine_Val, audioValues[4 + 4 * currentOsc]);
   }
   else
   {
     updateLabelValue(1, "", ui_Osc_Level_Val, audioValues[2 + 4 * currentOsc]);
-    lv_label_set_text(ui_Osc_Oct_Val, "-");
+    lv_label_set_text(ui_Osc_Semi_Val, "-");
     lv_label_set_text(ui_Osc_Fine_Val, "-");
   }
 }
@@ -499,7 +504,7 @@ void updateOscTab()
 
 void focusEncoderOscTab()
 {
-  static lv_obj_t *oscTabObjects[27] = {ui_OSC_1_Label_Container, ui_OSC_2_Label_Container, ui_Noise_Label_Container, ui_OSC_Prev_Waveform, ui_OSC_Next_Waveform, ui_Osc_Level_Val, ui_Osc_Oct_Val, ui_Osc_Fine_Val, ui_LFO_1_Label_Container, ui_LFO_2_Label_Container, ui_LFO_Prev_Waveform, ui_LFO_Next_Waveform, ui_LFO_ON_Container, ui_LFO_OFF_Container, ui_LFO_Freq_Val, ui_ENV_1_Tab_Label, ui_ENV_2_Tab_Label, ui_ENV_ON_Container, ui_ENV_OFF_Container, ui_Env_1_Attack_Time, ui_Env_1_Attack_Level, ui_Env_1_Decay_Time, ui_Env_1_Decay_Level, ui_Env_1_Sustain_Time, ui_Env_1_Sustain_Level, ui_Env_1_Release_Time, ui_Env_1_Release_Level};
+  static lv_obj_t *oscTabObjects[27] = {ui_OSC_1_Label_Container, ui_OSC_2_Label_Container, ui_Noise_Label_Container, ui_OSC_Prev_Waveform, ui_OSC_Next_Waveform, ui_Osc_Level_Val, ui_Osc_Semi_Val, ui_Osc_Fine_Val, ui_LFO_1_Label_Container, ui_LFO_2_Label_Container, ui_LFO_Prev_Waveform, ui_LFO_Next_Waveform, ui_LFO_ON_Container, ui_LFO_OFF_Container, ui_LFO_Freq_Val, ui_ENV_1_Tab_Label, ui_ENV_2_Tab_Label, ui_ENV_ON_Container, ui_ENV_OFF_Container, ui_Env_1_Attack_Time, ui_Env_1_Attack_Level, ui_Env_1_Decay_Time, ui_Env_1_Decay_Level, ui_Env_1_Sustain_Time, ui_Env_1_Sustain_Level, ui_Env_1_Release_Time, ui_Env_1_Release_Level};
   int oscTabObjValNdx[27] = {-1, -1, -1, -1, -1, 2 + 4 * currentOsc, 3 + 4 * currentOsc, 4 + 4 * currentOsc, -1, -1, -1, -1, -1, -1, 31 + 3 * currentLFO, -1, -1, -1, -1, 16 + 9 * currentEnv, 12 + 9 * currentEnv, 17 + 9 * currentEnv, 13 + 9 * currentEnv, 18 + 9 * currentEnv, 14 + 9 * currentEnv, 19 + 9 * currentEnv, 15 + 9 * currentEnv};
   static int focusedOscTabObjNdx = 0;
 
@@ -558,7 +563,7 @@ void focusEncoderOscTab()
           }
           else
           {
-            changeValue(&audioValues[oscTabObjValNdx[focusedOscTabObjNdx]], -4, 4, incrementVal, incrementMultiplier);
+            changeValue(&audioValues[oscTabObjValNdx[focusedOscTabObjNdx]], -48, 48, incrementVal, incrementMultiplier);
           }
           break;
 
@@ -608,7 +613,7 @@ void focusEncoderOscTab()
       {
         audioValues[1 + 4 * currentOsc] = (audioValues[1 + 4 * currentOsc] + 4) % 5;
         msg = "<" + audioValuesName[1 + 4 * currentOsc] + ":" + audioValues[1 + 4 * currentOsc] + ">";
-        Serial1.println(msg);
+        sendUARTMsg(msg);
       }
       break;
     case 4:
@@ -616,7 +621,7 @@ void focusEncoderOscTab()
       {
         audioValues[1 + 4 * currentOsc] = (audioValues[1 + 4 * currentOsc] + 1) % 5;
         msg = "<" + audioValuesName[1 + 4 * currentOsc] + ":" + audioValues[1 + 4 * currentOsc] + ">";
-        Serial1.println(msg);
+        sendUARTMsg(msg);
       }
       break;
     case 8:
@@ -628,22 +633,22 @@ void focusEncoderOscTab()
     case 10:
       audioValues[29 + 3 * currentLFO] = (audioValues[29 + 3 * currentLFO] + 3) % 4;
       msg = "<" + audioValuesName[29 + 3 * currentLFO] + ":" + audioValues[29 + 3 * currentLFO] + ">";
-      Serial1.println(msg);
+      sendUARTMsg(msg);
       break;
     case 11:
       audioValues[29 + 3 * currentLFO] = (audioValues[29 + 3 * currentLFO] + 1) % 4;
       msg = "<" + audioValuesName[29 + 3 * currentLFO] + ":" + audioValues[29 + 3 * currentLFO] + ">";
-      Serial1.println(msg);
+      sendUARTMsg(msg);
       break;
     case 12:
       audioValues[30 + 3 * currentLFO] = 1;
       msg = "<" + audioValuesName[30 + 3 * currentLFO] + ":" + audioValues[30 + 3 * currentLFO] + ">";
-      Serial1.println(msg);
+      sendUARTMsg(msg);
       break;
     case 13:
       audioValues[30 + 3 * currentLFO] = 0;
       msg = "<" + audioValuesName[30 + 3 * currentLFO] + ":" + audioValues[30 + 3 * currentLFO] + ">";
-      Serial1.println(msg);
+      sendUARTMsg(msg);
       break;
     case 15:
       currentEnv = 0;
@@ -654,13 +659,13 @@ void focusEncoderOscTab()
     case 17:
       audioValues[11 + 9 * currentEnv] = 1;
       msg = "<" + audioValuesName[11 + 9 * currentEnv] + ":" + audioValues[11 + 9 * currentEnv] + ">";
-      Serial1.println(msg);
+      sendUARTMsg(msg);
       break;
     case 18:
       audioValues[11 + 9 * currentEnv] = 0;
       audioValues[11] = 1;
       msg = "<" + audioValuesName[11 + 9 * currentEnv] + ":" + audioValues[11 + 9 * currentEnv] + ">";
-      Serial1.println(msg);
+      sendUARTMsg(msg);
       break;
 
     default:
@@ -680,7 +685,7 @@ void focusEncoderOscTab()
       {
         lv_obj_set_style_text_color(oscTabObjects[focusedOscTabObjNdx], lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
         msg = msg = "<" + audioValuesName[oscTabObjValNdx[focusedOscTabObjNdx]] + ":" + audioValues[oscTabObjValNdx[focusedOscTabObjNdx]] + ">";
-        Serial1.println(msg);
+        sendUARTMsg(msg);
       }
 
       break;
@@ -870,7 +875,7 @@ void focusEncoderFXTab()
       if (FXTabObjValNdx[currentFXPage][focusedFXTabObjNdx] != -1)
       {
         msg = msg = "<" + audioValuesName[FXTabObjValNdx[currentFXPage][focusedFXTabObjNdx]] + ":" + audioValues[FXTabObjValNdx[currentFXPage][focusedFXTabObjNdx]] + ">";
-        Serial1.println(msg);
+        sendUARTMsg(msg);
       }
     }
 
@@ -1144,14 +1149,14 @@ void focusMatrixTab()
           lv_obj_set_style_text_color(ui_comp_get_child(matrixTabObjects[currentMatrixPage][focusedMatrixTabCompNdx], 1 + focusedMatrixCompChildNdx), lv_color_hex(0x2EBAE4), 0);
           lv_obj_set_style_text_color(ui_comp_get_child(matrixTabObjects[currentMatrixPage][focusedMatrixTabCompNdx], 2 + focusedMatrixCompChildNdx), lv_color_hex(0x131927), 0);
           matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][1] = 0;
-          Serial1.println(generateMatrixMsg(2, matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][0], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][1], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][2], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][3], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][4]));
+          sendUARTMsg(generateMatrixMsg(2, matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][0], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][1], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][2], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][3], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][4]));
 
           break;
         case 2:
           lv_obj_set_style_text_color(ui_comp_get_child(matrixTabObjects[currentMatrixPage][focusedMatrixTabCompNdx], 1 + focusedMatrixCompChildNdx), lv_color_hex(0x2EBAE4), 0);
           lv_obj_set_style_text_color(ui_comp_get_child(matrixTabObjects[currentMatrixPage][focusedMatrixTabCompNdx], focusedMatrixCompChildNdx), lv_color_hex(0x131927), 0);
           matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][1] = 1;
-          Serial1.println(generateMatrixMsg(2, matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][0], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][1], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][2], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][3], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][4]));
+          sendUARTMsg(generateMatrixMsg(2, matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][0], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][1], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][2], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][3], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][4]));
 
           break;
 
@@ -1214,22 +1219,22 @@ void focusMatrixTab()
         {
         case 0:
           lv_obj_set_style_bg_color(ui_comp_get_child(matrixTabObjects[currentMatrixPage][focusedMatrixTabCompNdx], 1 + focusedMatrixCompChildNdx), lv_color_hex(0x131927), LV_PART_MAIN | LV_STATE_DEFAULT);
-          Serial1.println(generateMatrixMsg(-3, matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][0], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][1], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][2], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][3], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][4]));
-          Serial1.println(generateMatrixMsg(-2, matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][0], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][1], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][2], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][3], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][4]));
-          Serial1.println(generateMatrixMsg(-1, matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][0], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][1], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][2], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][3], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][4]));
+          sendUARTMsg(generateMatrixMsg(-3, matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][0], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][1], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][2], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][3], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][4]));
+          sendUARTMsg(generateMatrixMsg(-2, matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][0], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][1], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][2], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][3], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][4]));
+          sendUARTMsg(generateMatrixMsg(-1, matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][0], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][1], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][2], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][3], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][4]));
 
           matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][0] = dropdownSelectNdx;
           break;
         default:
-          Serial1.println(generateMatrixMsg(-3, matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][0], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][1], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][2], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][3], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][4]));
-          Serial1.println(generateMatrixMsg(-2, matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][0], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][1], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][2], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][3], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][4]));
-          Serial1.println(generateMatrixMsg(-1, matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][0], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][1], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][2], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][3], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][4]));
+          sendUARTMsg(generateMatrixMsg(-3, matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][0], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][1], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][2], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][3], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][4]));
+          sendUARTMsg(generateMatrixMsg(-2, matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][0], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][1], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][2], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][3], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][4]));
+          sendUARTMsg(generateMatrixMsg(-1, matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][0], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][1], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][2], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][3], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][4]));
           smallestIndex = findSmallestMissingIndex(matrixArrNdx, dropdownSelectNdx);
           matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][0] = dropdownSelectNdx;
           matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][4] = smallestIndex;
-          Serial1.println(generateMatrixMsg(0, matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][0], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][1], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][2], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][3], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][4]));
-          Serial1.println(generateMatrixMsg(1, matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][0], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][1], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][2], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][3], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][4]));
-          Serial1.println(generateMatrixMsg(2, matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][0], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][1], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][2], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][3], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][4]));
+          sendUARTMsg(generateMatrixMsg(0, matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][0], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][1], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][2], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][3], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][4]));
+          sendUARTMsg(generateMatrixMsg(1, matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][0], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][1], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][2], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][3], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][4]));
+          sendUARTMsg(generateMatrixMsg(2, matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][0], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][1], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][2], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][3], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][4]));
 
           lv_obj_set_style_bg_color(ui_comp_get_child(matrixTabObjects[currentMatrixPage][focusedMatrixTabCompNdx], 1 + focusedMatrixCompChildNdx), lv_color_hex(0x2EBAE4), LV_PART_MAIN | LV_STATE_DEFAULT);
           break;
@@ -1242,14 +1247,15 @@ void focusMatrixTab()
         switch (dropdownSelectNdx)
         {
         case 0:
-          Serial1.println(generateMatrixMsg(-3, matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][0], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][1], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][2], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][3], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][4]));
+          sendUARTMsg(generateMatrixMsg(-3, matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][0], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][1], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][2], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][3], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][4]));
           matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][2] = dropdownSelectNdx;
 
           lv_obj_set_style_bg_color(ui_comp_get_child(matrixTabObjects[currentMatrixPage][focusedMatrixTabCompNdx], 1 + focusedMatrixCompChildNdx), lv_color_hex(0x131927), LV_PART_MAIN | LV_STATE_DEFAULT);
           break;
         default:
-          matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][2] = dropdownSelectNdx;
-          Serial1.println(generateMatrixMsg(0, matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][0], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][1], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][2], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][3], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][4]));
+          matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][2] = dropdownSelectNdx - 1;
+          Serial.println("dropdownSelectNdx: " + String(dropdownSelectNdx));
+          sendUARTMsg(generateMatrixMsg(0, matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][0], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][1], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][2], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][3], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][4]));
           lv_obj_set_style_bg_color(ui_comp_get_child(matrixTabObjects[currentMatrixPage][focusedMatrixTabCompNdx], 1 + focusedMatrixCompChildNdx), lv_color_hex(0x2EBAE4), LV_PART_MAIN | LV_STATE_DEFAULT);
           break;
         }
@@ -1259,7 +1265,7 @@ void focusMatrixTab()
       case 4:
         int sliderValue = lv_slider_get_value(ui_comp_get_child(matrixTabObjects[currentMatrixPage][focusedMatrixTabCompNdx], 1 + focusedMatrixCompChildNdx));
         matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][3] = sliderValue;
-        Serial1.println(generateMatrixMsg(1, matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][0], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][1], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][2], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][3], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][4]));
+        sendUARTMsg(generateMatrixMsg(1, matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][0], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][1], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][2], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][3], matrixArrNdx[currentMatrixPage * 4 + focusedMatrixTabCompNdx][4]));
 
         isEditing = false;
         break;
@@ -1314,7 +1320,8 @@ void checkMacros()
             String destName = audioValuesName[macroDestNameNdx[macroConnections[j][1]]]; // name of variable
             int value = (macroValues[i] * macroConnections[j][2]) >> 8;                  // adjusting send value using the set amount
             String msg = "<" + destName + ":" + String(value) + ">";                     // generate msg string
-            Serial1.println(msg);                                                        // send msg
+            sendUARTMsg(msg);                                                            // send msg
+            audioValues[macroDestNameNdx[macroConnections[j][1]]] = value;               // update audioValues (for ui)
           }
         }
       }
@@ -1557,7 +1564,9 @@ void checkButtons()
 }
 
 hw_timer_t *analyzerUpdateTimer = NULL;
-bool AUT_expired = false;
+hw_timer_t *updateUITimer = NULL;
+volatile bool AUT_expired = false;
+volatile bool UI_expired = false;
 unsigned int sampling_period_us;
 
 void IRAM_ATTR analyzerUpdateTimerInterrupt()
@@ -1565,9 +1574,14 @@ void IRAM_ATTR analyzerUpdateTimerInterrupt()
   AUT_expired = true;
 }
 
+void IRAM_ATTR updateUITimerInterrupt()
+{
+  UI_expired = true;
+}
+
 #define SAMPLES 1024        // Must be a power of 2
 #define SAMPLING_FREQ 40000 // Hz, must be 40000 or less due to ADC conversion time. Determines maximum frequency that can be analysed by the FFT Fmax=sampleF/2.
-#define AMPLITUDE 15000     // Depending on your audio source level, you may need to alter this value. Can be used as a 'sensitivity' control.
+#define AMPLITUDE 60000     // Depending on your audio source level, you may need to alter this value. Can be used as a 'sensitivity' control.
 #define NUM_BANDS 10        // To change this, you will need to change the bunch of if statements describing the mapping from bins to bands
 #define NOISE 0             // Used as a crude noise filter, values below this are ignored
 
@@ -1700,6 +1714,11 @@ void setup()
   timerAlarmWrite(analyzerUpdateTimer, 30000, true);
   timerAlarmEnable(analyzerUpdateTimer); // Enable the alarm
 
+  updateUITimer = timerBegin(1, 80, true);                            // Timer 0, clock divider 80
+  timerAttachInterrupt(updateUITimer, &updateUITimerInterrupt, true); // Attach the interrupt handling function
+  timerAlarmWrite(updateUITimer, 600000, true);
+  timerAlarmEnable(updateUITimer); // Enable the alarm
+
   sampling_period_us = round(1000000 * (1.0 / SAMPLING_FREQ));
   updateOscTab();
   updateFXTab();
@@ -1720,6 +1739,24 @@ void loop()
     updateAnalyzer();
     checkMacros();
     AUT_expired = false;
+  }
+
+  if (UI_expired)
+  {
+    switch (currentMainTab)
+    {
+    case 0:
+      updateOscTab();
+      break;
+    case 1:
+      focusEncoderFXTab();
+      updateFXTab();
+
+      break;
+    default:
+      break;
+    }
+    UI_expired = false;
   }
   checkButtons();
   switch (currentMainTab)

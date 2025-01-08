@@ -708,25 +708,25 @@ void ui_Screen1_screen_init(void)
     lv_obj_set_style_text_align(ui_Osc_Level_Val, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_Osc_Level_Val, &ui_font_Kallisto_Medium_14, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_Osc_Oct_Label = lv_label_create(ui_OSC_Info);
-    lv_obj_set_width(ui_Osc_Oct_Label, 35);
-    lv_obj_set_height(ui_Osc_Oct_Label, LV_SIZE_CONTENT); /// 1
-    lv_obj_set_x(ui_Osc_Oct_Label, -16);
-    lv_obj_set_y(ui_Osc_Oct_Label, 0);
-    lv_obj_set_align(ui_Osc_Oct_Label, LV_ALIGN_BOTTOM_MID);
-    lv_label_set_text(ui_Osc_Oct_Label, "Oct:");
-    lv_obj_set_style_text_font(ui_Osc_Oct_Label, &ui_font_Kallisto_Medium_14, LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_Osc_Semi_Label = lv_label_create(ui_OSC_Info);
+    lv_obj_set_width(ui_Osc_Semi_Label, 36);
+    lv_obj_set_height(ui_Osc_Semi_Label, LV_SIZE_CONTENT); /// 1
+    lv_obj_set_x(ui_Osc_Semi_Label, -16);
+    lv_obj_set_y(ui_Osc_Semi_Label, 0);
+    lv_obj_set_align(ui_Osc_Semi_Label, LV_ALIGN_BOTTOM_MID);
+    lv_label_set_text(ui_Osc_Semi_Label, "Sem:");
+    lv_obj_set_style_text_font(ui_Osc_Semi_Label, &ui_font_Kallisto_Medium_14, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_Osc_Oct_Val = lv_label_create(ui_OSC_Info);
-    lv_obj_set_width(ui_Osc_Oct_Val, 30);
-    lv_obj_set_height(ui_Osc_Oct_Val, LV_SIZE_CONTENT); /// 1
-    lv_obj_set_x(ui_Osc_Oct_Val, 15);
-    lv_obj_set_y(ui_Osc_Oct_Val, 0);
-    lv_obj_set_align(ui_Osc_Oct_Val, LV_ALIGN_BOTTOM_MID);
-    lv_label_set_text(ui_Osc_Oct_Val, "0");
-    lv_obj_set_style_radius(ui_Osc_Oct_Val, 3, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_align(ui_Osc_Oct_Val, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_Osc_Oct_Val, &ui_font_Kallisto_Medium_14, LV_PART_MAIN | LV_STATE_DEFAULT);
+    ui_Osc_Semi_Val = lv_label_create(ui_OSC_Info);
+    lv_obj_set_width(ui_Osc_Semi_Val, 30);
+    lv_obj_set_height(ui_Osc_Semi_Val, LV_SIZE_CONTENT); /// 1
+    lv_obj_set_x(ui_Osc_Semi_Val, 15);
+    lv_obj_set_y(ui_Osc_Semi_Val, 0);
+    lv_obj_set_align(ui_Osc_Semi_Val, LV_ALIGN_BOTTOM_MID);
+    lv_label_set_text(ui_Osc_Semi_Val, "0");
+    lv_obj_set_style_radius(ui_Osc_Semi_Val, 3, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_align(ui_Osc_Semi_Val, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_Osc_Semi_Val, &ui_font_Kallisto_Medium_14, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     ui_Osc_Fine_Label = lv_label_create(ui_OSC_Info);
     lv_obj_set_width(ui_Osc_Fine_Label, 45);
